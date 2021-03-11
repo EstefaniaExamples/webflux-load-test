@@ -1,6 +1,7 @@
 package com.example.listdemo;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -8,15 +9,12 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
 
 @Service
 public class AppHandler {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppHandler.class);
     private final WebClient webClient;
 
     public AppHandler(final WebClient webClient) {
@@ -28,13 +26,14 @@ public class AppHandler {
 
         return Flux.fromIterable(accounts)
                 .log(Thread.currentThread().getName())
-                .subscribeOn(Schedulers.boundedElastic())
+//                .publishOn(Schedulers.boundedElastic())
                 .parallel()
                 .flatMap(account ->
                         webClient.get().uri("/stubs/accounts")
                                 .retrieve()
                                 .bodyToMono(Object.class)
                 )
+                .doOnError(throwable -> LOGGER.error("Error during runtime ", throwable))
                 .sequential()
                 .collectList()
         .flatMap(accountsWithBalances ->
