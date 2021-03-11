@@ -1,6 +1,5 @@
 package com.example.listdemo;
 
-import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +26,7 @@ public class AppContext {
         final ClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
 
         return WebClient.builder()
-                .baseUrl("https://industrial-aggregator-pre.santanderuk.pre.corp")
+                .baseUrl("http://localhost:1324")
                 .clientConnector(connector)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
