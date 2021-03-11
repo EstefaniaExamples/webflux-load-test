@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -26,8 +27,8 @@ public class AppHandler {
 
         return Flux.fromIterable(accounts)
                 .log(Thread.currentThread().getName())
-//                .publishOn(Schedulers.boundedElastic())
                 .parallel()
+                .runOn(Schedulers.boundedElastic())
                 .flatMap(account ->
                         webClient.get().uri("/stubs/accounts")
                                 .retrieve()
